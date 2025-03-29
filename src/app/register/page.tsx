@@ -56,8 +56,8 @@ export default function RegisterPage() {
       <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
         <div className="flex justify-center mb-6">
           {/* Logo aplikasi */}
-          <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center text-white text-2xl font-bold">
-            A
+          <div className="w-32 h-16 px-2 rounded-md bg-gradient-to-r from-blue-500 to-blue-700 flex items-center justify-center text-white text-2xl font-bold">
+            Register
           </div>
         </div>
 
@@ -186,10 +186,10 @@ export default function RegisterPage() {
             {loading ? 'Memproses...' : 'Daftar Sekarang'}
           </button>
         </form>
-        
+
         <div className="mt-6 text-center">
           <p className="text-sm text-gray-600">
-            Sudah memiliki akun?{' '} 
+            Sudah memiliki akun?{' '}
             <Link
               href="/"
               className="font-medium text-blue-600 hover:text-blue-800"
