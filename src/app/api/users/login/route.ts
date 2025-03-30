@@ -1,5 +1,6 @@
 // app/api/auth/login/route.ts
 import { NextRequest, NextResponse } from 'next/server';
+import { prisma } from '../../../../../lib/prisma';
 
 export async function POST(request: NextRequest) {
   try {
@@ -15,17 +16,22 @@ export async function POST(request: NextRequest) {
     }
 
     // Di sini, Anda akan menambahkan logika untuk memverifikasi kredensial dengan database
-    // Simulasi token sederhana untuk demonstrasi
-    const token = 'demo-token-' + Date.now();
 
-    // Buat respons dengan cookie dan redirect ke dashboard
+    // Buat nama pengguna dari email jika tidak disediakan
+    const userName = email.split('@')[0];
+
+    // Buat token yang menyimpan data pengguna
+    // Format: demo-token-TIMESTAMP-EMAIL-NAME
+    const token = `demo-token-${Date.now()}-${email}`;
+
+    // Buat respons
     const response = NextResponse.json({
       success: true,
       message: 'Login berhasil',
       redirectUrl: '/dashboard',
       user: {
         email,
-        name: email.split('@')[0], // Simulasi nama pengguna dari email
+        name: userName,
       },
     });
 
