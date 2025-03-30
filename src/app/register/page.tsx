@@ -3,8 +3,10 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 export default function RegisterPage() {
+  const router = useRouter();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -16,14 +18,20 @@ export default function RegisterPage() {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setFormData((prev) => {
+      const newData = {
+        ...prev,
+        [name]: value,
+      };
+      console.log(`Field ${name} diubah menjadi: ${value}`);
+      console.log('Data form saat ini:', newData);
+      return newData;
+    });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('Formulir dikirim dengan data:', formData);
     setError('');
 
     // Validasi sederhana
@@ -39,16 +47,46 @@ export default function RegisterPage() {
 
     setLoading(true);
 
-    // Simulasi proses pendaftaran
-    setTimeout(() => {
-      // Reset loading state
+    try {
+      // Kirim data ke API endpoint
+      const response = await fetch('/api/users/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          password: formData.password,
+          role: 'USER', // Default role untuk pengguna baru
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Terjadi kesalahan saat mendaftar');
+      }
+
+      // Reset form setelah berhasil
+      setFormData({
+        name: '',
+        email: '',
+        password: '',
+        confirmPassword: '',
+      });
+
+      // Tampilkan pesan sukses
+      alert('Pendaftaran berhasil! Silakan login dengan akun baru Anda.');
+
+      // Redirect ke halaman login
+      router.push('/');
+    } catch (err: any) {
+      setError(err.message || 'Terjadi kesalahan saat mendaftar');
+      console.error('Registration error:', err);
+    } finally {
       setLoading(false);
-
-      // Tampilkan alert untuk simulasi
-      alert('Pendaftaran berhasil! Silakan cek email Anda untuk verifikasi.');
-
-      // Dalam aplikasi sebenarnya, disini akan redirect ke halaman login
-    }, 1500);
+    }
   };
 
   return (
@@ -88,7 +126,7 @@ export default function RegisterPage() {
               type="text"
               value={formData.name}
               onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 text-gray-700 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="John Doe"
               required
             />
@@ -107,7 +145,7 @@ export default function RegisterPage() {
               type="email"
               value={formData.email}
               onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border text-gray-700 border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="nama@perusahaan.com"
               required
             />
@@ -126,7 +164,7 @@ export default function RegisterPage() {
               type="password"
               value={formData.password}
               onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 text-gray-700 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Minimal 8 karakter"
               minLength={8}
               required
@@ -150,7 +188,7 @@ export default function RegisterPage() {
               type="password"
               value={formData.confirmPassword}
               onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 text-gray-700 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Masukkan password kembali"
               required
             />
@@ -191,7 +229,7 @@ export default function RegisterPage() {
           <p className="text-sm text-gray-600">
             Sudah memiliki akun?{' '}
             <Link
-              href="/"
+              href="/login"
               className="font-medium text-blue-600 hover:text-blue-800"
             >
               Masuk di sini
